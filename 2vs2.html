@@ -243,6 +243,9 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:h
 .reset-button:hover {
   background-color: #c72a2a;
 }
+body.hide-cursor {
+  cursor: none;
+}
 </style>
 </head>
 
@@ -253,15 +256,15 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:h
     <div class="settings-container">
       <div class="setting">
         <label for="res1">პირველი რეზოლუცია</label>
-        <input type="text" id="res1" value="">
+        <input type="text" id="res1" value="R1">
       </div>
       <div class="setting">
         <label for="res2">მეორე რეზოლუცია</label>
-        <input type="text" id="res2" value="">
+        <input type="text" id="res2" value="R2">
       </div>
       <div class="setting">
         <label for="res3">მესამე რეზოლუცია</label>
-        <input type="text" id="res3" value="">
+        <input type="text" id="res3" value="R3">
       </div>
       <div class="setting">
         <label for="timer-minutes">დრო (წთ)</label>
@@ -383,9 +386,9 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:h
   }
 
   function resetSettings() {
-    res1Input.value = "";
-    res2Input.value = "";
-    res3Input.value = "";
+    res1Input.value = "R1";
+    res2Input.value = "R2";
+    res3Input.value = "R3";
     timerMinutesInput.value = "5";
 
     // update displays and save to cookies
@@ -433,6 +436,11 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:h
     const next = slides[i];
     next.classList.add("active");
     setTimeout(() => { from.classList.remove("exit"); activeIndex = i; busy = false; }, 800);
+    if (i === 0) {
+      document.body.classList.remove('hide-cursor');
+    } else {
+      document.body.classList.add('hide-cursor');
+    }
   }
 
   // === timer factory ===
