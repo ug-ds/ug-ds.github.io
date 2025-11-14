@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Debate Rooms</title>
+  <style>
+    :root {
+      --bg: #0C1A22;
+      --accent: #ED3737;
+      --text: #fff;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+      padding: 1rem 2rem;
+      background-color: #081218;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--accent);
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5rem;
+      padding: 2rem;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .gallery-button {
+      background-color: #1A2C38;
+      color: var(--text);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      padding: 2rem;
+      text-decoration: none;
+      text-align: center;
+      font-size: 1.2rem;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .gallery-button:hover {
+      transform: translateY(-5px);
+      background-color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="logo">DEBATE</div>
+  </nav>
+
+  <main>
+    <div id="button-gallery" class="gallery">
+      <!-- Buttons will be inserted here by the script -->
+    </div>
+  </main>
+
+  <script>
+    const links = [
+      { name: "1 VS N", url: "1vsN.html" },
+      { name: "2 VS 2", url: "2vs2.html" },
+    ];
+
+    const gallery = document.getElementById('button-gallery');
+
+    links.forEach(link => {
+      const a = document.createElement('a');
+      a.href = link.url;
+      a.className = 'gallery-button';
+      a.textContent = link.name;
+      gallery.appendChild(a);
+    });
+  </script>
+
+</body>
+</html>

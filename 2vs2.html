@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>UG DS Slides</title>
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Saira:ital,wght@0,100..900;1,100..900&display=swap');
+
+:root {
+  --bg: #0C1A22;
+  --accent: #ED3737;
+  --text: #fff;
+  --photo-size: 90vmin;
+  --blur: 20px;
+  --transition: 1s cubic-bezier(.22,1,.36,1);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:hidden;}
+.slides{position:relative;width:100%;height:100%;  font-family: "Saira", sans-serif;}
+
+/* === Base Slide Animation === */
+.slide{
+  position:absolute;inset:0;display:grid;place-items:center;
+  opacity:0;transform:translateY(60px);filter:blur(var(--blur));overflow: hidden;
+  transition:opacity var(--transition),transform var(--transition),filter var(--transition);
+  pointer-events: none;
+}
+.slide.active{opacity:1;transform:translateY(0);filter:none;overflow: hidden; pointer-events: auto;}
+.slide.exit{opacity:0;transform:translateY(-60px);filter:blur(var(--blur));overflow: hidden;}
+
+/* === Slide 1 (center photo) === */
+#slide-1 img, #slide-4 img {
+  width:var(--photo-size);height:var(--photo-size);
+  object-fit:contain;border-radius:0;
+  opacity:0;transform:scale(0.8);filter:blur(10px);
+  transition:opacity 1.2s ease,transform 1s ease,filter 1.2s ease;
+}
+#slide-1.active img, #slide-4.active img {
+  opacity:1;transform:scale(1);filter:blur(0);
+}
+
+
+#slide-2 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--bg);
+}
+
+/* === Slide 2 (fullscreen image) === */
+#slide-2 img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
+  background-color: var(--bg);
+}
+
+/* === Slide 4 (Timer) === */
+.timer {
+  font-family: "Saira", sans-serif;
+  font-weight: 700;font-variant-numeric: tabular-nums;
+  font-size: clamp(48px, 40vmin, 440px);
+  letter-spacing: .03em;position:relative;
+  display:flex;gap:0.02em;color:var(--text);
+  transition:color .3s ease, filter .6s ease, opacity .6s ease;
+}
+.timer.paused{color:var(--accent);}
+.timer.resetting{
+  filter:blur(60px);
+  opacity:0;
+  transition:filter 1s ease, opacity 1s ease;
+}
+.timer .digit{position:relative;display:inline-block;width:1ch;text-align:center;}
+.digit .prev,.digit .next{
+  position:absolute;inset:0;display:flex;justify-content:center;align-items:center;
+}
+.digit .prev{opacity:1;filter:none;transform:translateY(0);}
+.digit .next{opacity:0;filter:blur(20px);transform:translateY(40%);}
+.digit.anim .prev{animation:fadeOut .4s ease forwards;}
+.digit.anim .next{animation:fadeIn .4s ease forwards;}
+@keyframes fadeOut{0%{opacity:1;transform:translateY(0);}100%{opacity:0;transform:translateY(-40%);filter:blur(10px);} }
+@keyframes fadeIn{0%{opacity:0;transform:translateY(40%);filter:blur(10px);}100%{opacity:1;transform:translateY(0);filter:none;}}
+
+/* === Slide 5 (QR) === */
+.qr-wrap {
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  text-align: center;
+  height: 100%;
+}
+.qr-box {
+  width: var(--photo-size);
+  height: var(--photo-size);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0;
+  overflow: hidden;
+}
+.qr-svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.qr-text{font-size:4rem;font-weight:800;color:#fff;letter-spacing:2px;margin-top:0;}
+
+.timer-with-photo-container {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.timer-top-image {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 30vmin;
+    margin-bottom: 2rem;
+}
+
+/* === Placeholder (Slide 6) === */
+.placeholder{font-size:clamp(32px,10vmin,120px);font-weight:900;opacity:.8;}
+
+.timer-overlay {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(20px);
+  background: rgba(12, 26, 34, 0.3);
+  display: grid;
+  place-items: center;
+  z-index: 10;
+  transition: opacity 0.5s ease;
+}
+
+.controls-overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(12, 26, 34, 0.75);
+  backdrop-filter: blur(20px);
+  color: var(--text);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 99;
+}
+.controls-overlay.visible {opacity: 1;}
+.controls-box {
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  padding: 2rem 3rem;
+  text-align: left;
+  font-family: "Saira", sans-serif;
+  font-size: 1.5rem;
+  line-height: 1.8;
+}
+.controls-box h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 2rem;
+  color: var(--accent);
+}
+.settings-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 80%;
+  max-width: 1000px;
+}
+.setting {
+  display: flex;
+  flex-direction: column;
+}
+.setting label {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+.setting input {
+  font-size: 1.5rem;
+  padding: 0.5rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #333;
+  color: #fff;
+}
+.resolution-text {
+  font-size: clamp(100px, 8vmin, 120px);
+  font-weight: 800;
+  text-align: center;
+}
+</style>
+</head>
+
+<body>
+<div class="slides">
+  
+  <section class="slide active" id="slide-0">
+    <div class="settings-container">
+      <div class="setting">
+        <label for="res1">First Resolution</label>
+        <input type="text" id="res1" value="პირველი">
+      </div>
+      <div class="setting">
+        <label for="res2">Second Resolution</label>
+        <input type="text" id="res2" value="მეორე">
+      </div>
+      <div class="setting">
+        <label for="res3">Third Resolution</label>
+        <input type="text" id="res3" value="მესამე">
+      </div>
+      <div class="setting">
+        <label for="timer-minutes">Timer (minutes)</label>
+        <input type="number" id="timer-minutes" value="5" min="1" max="59">
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" id="slide-1">
+    <div class="resolution-text" id="res-display-1"></div>
+  </section>
+
+  <section class="slide" id="slide-2">
+    <div class="resolution-text" id="res-display-2"></div>
+  </section>
+
+  <section class="slide" id="slide-3">
+    <div class="resolution-text" id="res-display-3"></div>
+  </section>
+
+  <section class="slide" id="slide-4">
+    <img src="https://github.com/David3dArt/UGSTUFF/blob/main/logo/UG-DS-LOGO-WHITE-1x1.png?raw=true" alt="UGDS Logo">
+  </section>
+
+  <section class="slide" id="slide-5">
+    <div class="timer-with-photo-container">
+        <img src="https://github.com/David3dArt/UGSTUFF/blob/main/logo/UG-DS-LOGO-WHITE-1x1.png?raw=true" alt="UGDS Logo" class="timer-top-image">
+        <div class="timer" id="timer"></div>
+    </div>
+  </section>
+
+  <section class="slide" id="slide-6">
+    <div class="placeholder"></div>
+  </section>
+</div>
+
+<!-- preload audio elements -->
+<audio id="timerTick" src="https://github.com/David3dArt/UGSTUFF/raw/refs/heads/main/sfx/timer%20tick.mp3" preload="auto"></audio>
+
+<script>
+(function(){
+  const slides = document.querySelectorAll(".slide");
+  let activeIndex = 0, busy = false;
+
+  // === Get new elements ===
+  const res1Input = document.getElementById('res1');
+  const res2Input = document.getElementById('res2');
+  const res3Input = document.getElementById('res3');
+  const timerMinutesInput = document.getElementById('timer-minutes');
+
+  const resDisplay1 = document.getElementById('res-display-1');
+  const resDisplay2 = document.getElementById('res-display-2');
+  const resDisplay3 = document.getElementById('res-display-3');
+
+  // === Update resolution display slides ===
+  function updateResolutionDisplays() {
+    resDisplay1.textContent = res1Input.value;
+    resDisplay2.textContent = res2Input.value;
+    resDisplay3.textContent = res3Input.value;
+  }
+
+  // === Event listeners for resolution inputs ===
+  res1Input.addEventListener('input', updateResolutionDisplays);
+  res2Input.addEventListener('input', updateResolutionDisplays);
+  res3Input.addEventListener('input', updateResolutionDisplays);
+  
+  // === Initial update ===
+  updateResolutionDisplays();
+
+  /* === 🔧 easy timer setup === */
+  let timer1Minutes = parseInt(timerMinutesInput.value, 10);
+  const TIMER2_MINUTES = 10; // change this to adjust second timer
+
+  // === preload sounds ===
+  const timerTick = document.getElementById("timerTick");
+  timerTick.load();
+  const playSound = a => { a.currentTime = 0; a.play().catch(()=>{}); };
+
+  // === slide switching ===
+  function showSlide(i) {
+    if (busy || i === activeIndex || i < 0 || i >= slides.length) return;
+    busy = true;
+    const from = slides[activeIndex];
+    from.classList.remove("active"); from.classList.add("exit");
+    const next = slides[i];
+    next.classList.add("active");
+    setTimeout(() => { from.classList.remove("exit"); activeIndex = i; busy = false; }, 800);
+  }
+
+  // === timer factory ===
+  function createTimer(slideId, timerId, totalSeconds) {
+    const timerEl=document.getElementById(timerId);
+    if (!timerEl) return null;
+    const slideEl=document.getElementById(slideId);
+    let running=false, raf=null, startTimestamp=null, elapsed=0;
+    let finished=false;
+
+    const setNormal = ()=> timerEl.style.color="var(--text)";
+    const setRed    = ()=> timerEl.style.color="var(--accent)";
+
+    const fmt=sec=>{
+      sec=Math.max(sec,0);
+      const m=Math.floor(sec/60),s=Math.floor(sec%60);
+      return String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+    };
+
+    function renderDigits(t){
+      timerEl.innerHTML="";
+      for(const ch of t){
+        const d=document.createElement("div");d.className="digit";
+        const p=document.createElement("div");p.className="prev";
+        const n=document.createElement("div");n.className="next";
+        p.textContent=n.textContent=ch;d.append(p,n);timerEl.appendChild(d);
+      }
+    }
+
+    function updateDisplay(o,n){
+      const ds=timerEl.children;
+      for(let i=0;i<ds.length;i++){
+        const d=ds[i],p=d.querySelector(".prev"),x=d.querySelector(".next");
+        if(o[i]!==n[i]){
+          x.textContent=n[i];
+          d.classList.add("anim");
+          setTimeout(()=>{p.textContent=n[i];d.classList.remove("anim");},400);
+        }
+      }
+    }
+
+    function loop(now){
+      if(!running)return;
+      const ce=(now-startTimestamp)/1000;
+      const rem=Math.max(totalSeconds-ce,0);
+      const o=fmt(Math.ceil(totalSeconds-elapsed));
+      const n=fmt(Math.ceil(rem));
+      if(o!==n){updateDisplay(o,n);playSound(timerTick);}
+      elapsed=ce;
+
+      if(rem<=0 && !finished){
+        finished=true;
+        running=false;
+        timerEl.classList.add("paused");
+        setRed();
+        return;
+      }
+      raf=requestAnimationFrame(loop);
+    }
+
+    function start(){
+      if(running)return;
+      finished=false;
+      setNormal();
+      timerEl.classList.remove("paused");
+      running=true;
+      startTimestamp=performance.now()-elapsed*1000;
+      raf=requestAnimationFrame(loop);
+    }
+
+    function pause(){
+      if(!running)return;
+      running=false;
+      if(raf)cancelAnimationFrame(raf);
+      timerEl.classList.add("paused");
+      setRed();
+    }
+
+    function reset(){
+      if(raf)cancelAnimationFrame(raf);
+      running=false;
+      finished=false;
+      timerEl.classList.add("paused");
+      timerEl.classList.add("resetting");
+      setTimeout(()=>{
+        elapsed=0;
+        renderDigits(fmt(totalSeconds));
+        timerEl.classList.remove("resetting");
+        setRed();
+      },600);
+    }
+    
+    function updateTotal(newTotalSeconds) {
+        totalSeconds = newTotalSeconds;
+        reset();
+    }
+
+    renderDigits(fmt(totalSeconds));
+    setRed();
+    return {start,pause,reset,updateTotal,
+      get running(){return running;}};  
+  }
+
+  let timer4 = createTimer("slide-5","timer",timer1Minutes * 60);
+  
+  timerMinutesInput.addEventListener('input', () => {
+      let value = parseInt(timerMinutesInput.value, 10);
+      if (!isNaN(value) && value > 59) {
+          timerMinutesInput.value = 59;
+      }
+      
+      let newMinutes = parseInt(timerMinutesInput.value, 10);
+      if (!isNaN(newMinutes) && newMinutes > 0) {
+        timer1Minutes = newMinutes;
+        if (timer4) {
+            timer4.updateTotal(timer1Minutes * 60);
+        }
+      }
+  });
+
+  timerMinutesInput.addEventListener('blur', () => {
+      let value = parseInt(timerMinutesInput.value, 10);
+      if (isNaN(value) || value < 1) {
+          timerMinutesInput.value = 1;
+          timer1Minutes = 1;
+          if (timer4) {
+              timer4.updateTotal(timer1Minutes * 60);
+          }
+      }
+  });
+
+
+
+  function currentTimer(){
+    if(activeIndex===5)return timer4;
+    return null;
+  }
+
+  window.addEventListener("keydown",e=>{
+    const k=e.key;
+
+    // Handle Escape key to go to slide 0
+    if (k === 'Escape') {
+        showSlide(0);
+        return;
+    }
+
+    // Handle Enter key on slide 0
+    if (k === 'Enter' && activeIndex === 0) {
+        showSlide(5); // Go to what was slide 6 (now at index 5)
+        return;
+    }
+
+    // If typing in an input, do nothing more
+    if (e.target.tagName.toLowerCase() === 'input') {
+        return;
+    }
+
+    // Handle number keys 1-5 for slides 1-5
+    if (/^[1-5]$/.test(k)) {
+        // If on slide 0, block navigation
+        if (activeIndex === 0) {
+            return;
+        }
+        showSlide(parseInt(k));
+        return;
+    }
+
+    if(k.toLowerCase()==="r"){const t=currentTimer();if(t)t.reset();return;}
+
+    if(k===" "){
+      const t=currentTimer();if(!t)return;
+      if(t.running)t.pause();else t.start();
+      return;
+    }
+  });
+
+  let startX=0,startY=0;
+  window.addEventListener("touchstart",e=>{
+    const t=e.touches[0];startX=t.clientX;startY=t.clientY;
+  },{passive:true});
+  window.addEventListener("touchend",e=>{
+    const t=e.changedTouches[0];
+    const dx=t.clientX-startX,dy=t.clientY-startY;
+    const absX=Math.abs(dx),absY=Math.abs(dy);
+    if(absX>50&&absX>absY){
+      if(dx>0)showSlide(activeIndex-1);else showSlide(activeIndex+1);
+    }else if(absY>50&&absY>absX){
+      const timer=currentTimer();
+      if(!timer) return;
+      if(dy>0){if(timer.running)timer.pause();else timer.start();}
+    }
+  },{passive:true});
+})();
+</script>
+
+
+</body>
+</html>
