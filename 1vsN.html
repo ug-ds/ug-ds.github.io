@@ -191,14 +191,62 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:h
   font-size: 2rem;
   color: var(--accent);
 }
+.settings-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 80%;
+  max-width: 1000px;
+}
+.setting {
+  display: flex;
+  flex-direction: column;
+}
+.setting label {
+  font-size: 1.5rem;
+  margin-bottom: 0.6rem;
+  font-weight: 600;
+}
+.setting input {
+  font-size: 1.5rem;
+  padding: 0.8rem 1rem;
+  border-radius: 20px;
+  border: 2px solid var(--accent);
+  background-color: var(--bg);
+  color: #fff;
+  font-family: "Noto Sans Georgian", sans-serif;
+}
+.timer-with-photo-container {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.timer-top-image {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 30vmin;
+    margin-bottom: 10rem;
+}
 </style>
 </head>
 
 <body>
 <div class="slides">
   
-  <!-- 🟩 Added empty Slide 0 -->
   <section class="slide active" id="slide-0">
+    <div class="settings-container">
+      <div class="setting">
+        <label for="timer1-minutes">First Timer (min)</label>
+        <input type="number" id="timer1-minutes" value="20" min="1" max="59">
+      </div>
+      <div class="setting">
+        <label for="timer2-minutes">Second Timer (min)</label>
+        <input type="number" id="timer2-minutes" value="10" min="1" max="59">
+      </div>
+    </div>
   </section>
 
   <section class="slide" id="slide-1">
@@ -216,7 +264,10 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:h
   </section>
 
   <section class="slide" id="slide-4">
-    <div class="timer" id="timer"></div>
+    <div class="timer-with-photo-container">
+        <img src="https://raw.githubusercontent.com/ug-ds/ug-ds.github.io/761a9da78b14f5bafe56827eaed0f8e0d54bead8/assets/ug%20ds%20logo%20svg.svg" alt="UGDS Logo" class="timer-top-image">
+        <div class="timer" id="timer"></div>
+    </div>
   </section>
 
   <section class="slide" id="slide-5">
@@ -241,23 +292,80 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:h
 <audio id="countBeep" src="sfx/tick%203s%20timer%203.mp3" preload="auto"></audio>
 <audio id="countEnd"  src="sfx/tick%203s%20timer%202.mp3" preload="auto"></audio>
 <audio id="timerTick" src="sfx/timer%20tick.mp3" preload="auto"></audio>
+<audio id="timesup" src="sfx/times_up.mp3" preload="auto"></audio>
 
 <script>
 (function(){
   const slides = document.querySelectorAll(".slide");
-  let activeIndex = 0, busy = false;
+  let activeIndex = 0, busy = false, resetting = false;
   const COUNTDOWN_SPEED = 900;
   const ZERO_HOLD_TIME = 3000;
 
+  // === Cookie functions ===
+  function setCookie(name, value, days) {
+      let expires = "";
+      if (days) {
+          const date = new Date();
+          date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+          expires = "; expires=" + date.toUTCString();
+      }
+      document.cookie = name + "=" + (value || "")  + expires + "; path=/; SameSite=Lax";
+  }
+
+  function getCookie(name) {
+      const nameEQ = name + "=";
+      const ca = document.cookie.split(';');
+      for(let i=0;i < ca.length;i++) {
+          let c = ca[i];
+          while (c.charAt(0)==' ') c = c.substring(1,c.length);
+          if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+      }
+      return null;
+  }
+
+  // === Get new elements ===
+  const timer1MinutesInput = document.getElementById('timer1-minutes');
+  const timer2MinutesInput = document.getElementById('timer2-minutes');
+
   /* === 🔧 easy timer setup === */
-  const TIMER1_MINUTES = 20; // change this to adjust first timer
-  const TIMER2_MINUTES = 10; // change this to adjust second timer
+  let timer1Minutes = 20;
+  let timer2Minutes = 10;
+
+  // === Settings functions ===
+  function saveSettings() {
+      setCookie('timer1Minutes', timer1MinutesInput.value, 365);
+      setCookie('timer2Minutes', timer2MinutesInput.value, 365);
+  }
+
+  function loadSettings() {
+      const t1 = getCookie('timer1Minutes');
+      if (t1) timer1MinutesInput.value = t1;
+
+      const t2 = getCookie('timer2Minutes');
+      if (t2) timer2MinutesInput.value = t2;
+      
+      let newMinutes1 = parseInt(timer1MinutesInput.value, 10);
+      if (!isNaN(newMinutes1) && newMinutes1 > 0) {
+          timer1Minutes = newMinutes1;
+          if (timer4) {
+              timer4.updateTotal(timer1Minutes * 60);
+          }
+      }
+      let newMinutes2 = parseInt(timer2MinutesInput.value, 10);
+      if (!isNaN(newMinutes2) && newMinutes2 > 0) {
+          timer2Minutes = newMinutes2;
+          if (timer5) {
+              timer5.updateTotal(timer2Minutes * 60);
+          }
+      }
+  }
 
   // === preload sounds ===
   const countBeep = document.getElementById("countBeep");
   const countEnd  = document.getElementById("countEnd");
   const timerTick = document.getElementById("timerTick");
-  [countBeep, countEnd, timerTick].forEach(a => a.load());
+  const timesup = document.getElementById("timesup");
+  [countBeep, countEnd, timerTick, timesup].forEach(a => a.load());
   const playSound = a => { a.currentTime = 0; a.play().catch(()=>{}); };
 
   // === slide switching ===
@@ -362,6 +470,7 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:h
         running=false;
         timerEl.classList.add("paused");
         setRed();
+        playSound(timesup);
         return;
       }
       raf=requestAnimationFrame(loop);
@@ -386,9 +495,11 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:h
     }
 
     function reset(){
+      if(resetting) return;
       if(raf)cancelAnimationFrame(raf);
       running=false;
       finished=false;
+      resetting = true;
       timerEl.classList.add("paused");
       timerEl.classList.add("resetting");
       setTimeout(()=>{
@@ -396,7 +507,13 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:h
         renderDigits(fmt(totalSeconds));
         timerEl.classList.remove("resetting");
         setRed();
+        resetting = false;
       },600);
+    }
+    
+    function updateTotal(newTotalSeconds) {
+        totalSeconds = newTotalSeconds;
+        reset();
     }
 
     function showOverlay(){
@@ -435,17 +552,78 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:h
 
     renderDigits(fmt(totalSeconds));
     setRed();
-    return {start,pause,reset,showOverlay,removeOverlay,
+    return {start,pause,reset,showOverlay,removeOverlay,updateTotal,
       get running(){return running;},get overlayActive(){return overlayActive;}};  
   }
 
-  const timer4 = createTimer("slide-4","timer",TIMER1_MINUTES * 60);
+  const timer4 = createTimer("slide-4","timer",timer1Minutes * 60);
   const slide5=document.getElementById("slide-5");
-  slide5.innerHTML="";
-  const timer5El=document.createElement("div");
-  timer5El.className="timer";timer5El.id="timer2";
-  slide5.appendChild(timer5El);
-  const timer5=createTimer("slide-5","timer2",TIMER2_MINUTES * 60);
+  slide5.innerHTML=`
+    <div class="timer-with-photo-container">
+        <img src="https://raw.githubusercontent.com/ug-ds/ug-ds.github.io/761a9da78b14f5bafe56827eaed0f8e0d54bead8/assets/ug%20ds%20logo%20svg.svg" alt="UGDS Logo" class="timer-top-image">
+        <div class="timer" id="timer2"></div>
+    </div>
+  `;
+  const timer5=createTimer("slide-5","timer2",timer2Minutes * 60);
+
+  timer1MinutesInput.addEventListener('input', () => {
+      let value = parseInt(timer1MinutesInput.value, 10);
+      if (!isNaN(value) && value > 59) {
+          timer1MinutesInput.value = 59;
+      }
+      
+      let newMinutes = parseInt(timer1MinutesInput.value, 10);
+      if (!isNaN(newMinutes) && newMinutes > 0) {
+        timer1Minutes = newMinutes;
+        if (timer4) {
+            timer4.updateTotal(timer1Minutes * 60);
+        }
+      }
+      saveSettings();
+  });
+
+  timer1MinutesInput.addEventListener('blur', () => {
+      let value = parseInt(timer1MinutesInput.value, 10);
+      if (isNaN(value) || value < 1) {
+          timer1MinutesInput.value = 1;
+          timer1Minutes = 1;
+          if (timer4) {
+              timer4.updateTotal(timer1Minutes * 60);
+          }
+      }
+      saveSettings();
+  });
+
+  timer2MinutesInput.addEventListener('input', () => {
+      let value = parseInt(timer2MinutesInput.value, 10);
+      if (!isNaN(value) && value > 59) {
+          timer2MinutesInput.value = 59;
+      }
+      
+      let newMinutes = parseInt(timer2MinutesInput.value, 10);
+      if (!isNaN(newMinutes) && newMinutes > 0) {
+        timer2Minutes = newMinutes;
+        if (timer5) {
+            timer5.updateTotal(timer2Minutes * 60);
+        }
+      }
+      saveSettings();
+  });
+
+  timer2MinutesInput.addEventListener('blur', () => {
+      let value = parseInt(timer2MinutesInput.value, 10);
+      if (isNaN(value) || value < 1) {
+          timer2MinutesInput.value = 1;
+          timer2Minutes = 1;
+          if (timer5) {
+              timer5.updateTotal(timer2Minutes * 60);
+          }
+      }
+      saveSettings();
+  });
+
+  // === Initial Load ===
+  loadSettings();
 
   function currentTimer(){
     if(activeIndex===4)return timer4;
@@ -455,9 +633,24 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:h
 
   window.addEventListener("keydown",e=>{
     const k=e.key;
+
+    if (e.target.tagName.toLowerCase() === 'input') {
+        return;
+    }
+
+    if (k === 'Escape') {
+        showSlide(0);
+        return;
+    }
+
+    if (k === 'Enter' && activeIndex === 0) {
+        showSlide(1);
+        return;
+    }
+
     if(k.toLowerCase()==="r"){const t=currentTimer();if(t)t.reset();return;}
     if(countdownRunning)return;
-    if(/^[0-6]$/.test(k)){showSlide(parseInt(k));return;} // now includes 0 for new slide
+    if(/^[1-6]$/.test(k)){showSlide(parseInt(k));return;}
 
     if(k===" "){
       const t=currentTimer();if(!t)return;
