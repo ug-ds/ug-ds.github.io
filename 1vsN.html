@@ -261,6 +261,49 @@ body.hide-cursor {
 .reset-button:hover {
   background-color: #c72a2a;
 }
+.setting.toggle {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.setting.toggle label {
+  margin-bottom: 0;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #444;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute; content: ""; height: 26px; width: 26px;
+  left: 4px; bottom: 4px; background-color: white;
+  transition: .4s; border-radius: 50%;
+}
+input:checked + .slider { background-color: var(--accent); }
+input:checked + .slider:before { transform: translateX(26px); }
 </style>
 </head>
 
@@ -276,6 +319,13 @@ body.hide-cursor {
       <div class="setting">
         <label for="timer2-minutes">Second Timer (min)</label>
         <input type="number" id="timer2-minutes" value="10" min="1" max="59">
+      </div>
+      <div class="setting toggle">
+        <label for="audio-toggle">Enable Audio</label>
+        <label class="toggle-switch">
+          <input type="checkbox" id="audio-toggle" checked>
+          <span class="slider"></span>
+        </label>
       </div>
       <button id="reset-settings-btn" class="reset-button">Reset to Default</button>
     </div>
@@ -398,10 +448,12 @@ body.hide-cursor {
   const countEnd  = document.getElementById("countEnd");
   const timerTick = document.getElementById("timerTick");
   const timesup = document.getElementById("timesup");
+  const audioToggle = document.getElementById("audio-toggle");
   [countBeep, countEnd, timerTick, timesup].forEach(a => a.load());
-  const playSound = a => { a.currentTime = 0; a.play().catch(()=>{}); };
+  const playSound = a => { if(audioToggle.checked) { a.currentTime = 0; a.play().catch(()=>{}); } };
 
   function audioReady(audio) {
+    if (!audioToggle.checked) return Promise.resolve();
     return new Promise(resolve => {
         if (audio.readyState >= 4) {
             resolve();
@@ -410,6 +462,16 @@ body.hide-cursor {
         }
     });
   }
+
+  function saveAudioSetting() {
+    setCookie('audioEnabled', audioToggle.checked, 365);
+  }
+
+  function loadAudioSetting() {
+    const audioEnabled = getCookie('audioEnabled');
+    if (audioEnabled !== null) audioToggle.checked = (audioEnabled === 'true');
+  }
+  audioToggle.addEventListener('change', saveAudioSetting);
 
   // === slide switching ===
   function showSlide(i) {
@@ -473,7 +535,7 @@ body.hide-cursor {
   function createTimer(slideId, timerId, totalSeconds) {
     const timerEl=document.getElementById(timerId);
     const slideEl=document.getElementById(slideId);
-    let running=false, raf=null, startTimestamp=null, elapsed=0;
+    let running=false, raf=null, startTimestamp=null, elapsed=0, pauseSoundTimeout = null;
     let overlayActive=false, overlay=null, finished=false;
 
     const setNormal = ()=> timerEl.style.color="var(--text)";
@@ -529,6 +591,12 @@ body.hide-cursor {
 
     function start(){
       if(running||overlayActive||countdownRunning)return;
+      if (pauseSoundTimeout) {
+        clearTimeout(pauseSoundTimeout);
+        pauseSoundTimeout = null;
+        timesup.pause();
+        timesup.currentTime = 0;
+      }
       finished=false;
       setNormal();
       timerEl.classList.remove("paused");
@@ -544,6 +612,10 @@ body.hide-cursor {
       timerEl.classList.add("paused");
       setRed();
       playSound(timesup);
+      pauseSoundTimeout = setTimeout(() => {
+        timesup.pause();
+        timesup.currentTime = 0;
+      }, 5000);
     }
 
     function reset(){
@@ -680,6 +752,7 @@ body.hide-cursor {
 
   // === Initial Load ===
   loadSettings();
+  loadAudioSetting();
 
   document.getElementById('reset-settings-btn').addEventListener('click', () => {
     const defaultTimer1 = 20;
