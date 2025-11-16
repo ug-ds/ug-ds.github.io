@@ -30,8 +30,9 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:h
   position:absolute;inset:0;display:grid;place-items:center;
   opacity:0;transform:translateY(60px);filter:blur(var(--blur));overflow: hidden;
   transition:opacity var(--transition),transform var(--transition),filter var(--transition);
+  pointer-events: none;
 }
-.slide.active{opacity:1;transform:translateY(0);filter:none;overflow: hidden;}
+.slide.active{opacity:1;transform:translateY(0);filter:none;overflow: hidden; pointer-events: auto;}
 .slide.exit{opacity:0;transform:translateY(-60px);filter:blur(var(--blur));overflow: hidden;}
 
 /* === Slide 1 (center photo) === */
@@ -83,7 +84,7 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:h
   opacity:1;transition:opacity .5s ease;
 }
 .title.hidden{opacity:0;}
-.countdown{position:absolute;inset:0;display:grid;place-items:center;}
+.countdown{position:absolute;inset:0;display:grid;place-items:center;font-family: "Saira", sans-serif;}
 .circle {
   width: 400px;
   height: 400px;
@@ -214,7 +215,7 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:h
   border: 2px solid var(--accent);
   background-color: var(--bg);
   color: #fff;
-  font-family: "Noto Sans Georgian", sans-serif;
+  font-family: "Saira", sans-serif;
 }
 .timer-with-photo-container {
   position: relative;
@@ -229,6 +230,36 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:h
     transform: translateX(-50%);
     height: 30vmin;
     margin-bottom: 10rem;
+}
+.start-prompt {
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  font-size: 2rem;
+  color: var(--text);
+  opacity: 1;
+  text-transform: uppercase;
+  font-family: "Saira", sans-serif;
+}
+body.hide-cursor {
+  cursor: none;
+}
+.reset-button {
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+  background-color: var(--accent);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  justify-self: center;
+  font-family: "Noto Sans Georgian", sans-serif;
+}
+.reset-button:hover {
+  background-color: #c72a2a;
 }
 </style>
 </head>
@@ -246,7 +277,9 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:h
         <label for="timer2-minutes">Second Timer (min)</label>
         <input type="number" id="timer2-minutes" value="10" min="1" max="59">
       </div>
+      <button id="reset-settings-btn" class="reset-button">Reset to Default</button>
     </div>
+    <div class="start-prompt">press enter to start</div>
   </section>
 
   <section class="slide" id="slide-1">
@@ -289,10 +322,10 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:h
 </div>
 
 <!-- preload audio elements -->
-<audio id="countBeep" src="sfx/tick%203s%20timer%203.mp3" preload="auto"></audio>
-<audio id="countEnd"  src="sfx/tick%203s%20timer%202.mp3" preload="auto"></audio>
-<audio id="timerTick" src="sfx/timer%20tick.mp3" preload="auto"></audio>
-<audio id="timesup" src="sfx/times_up.mp3" preload="auto"></audio>
+<audio id="countBeep" src="/sfx/tick%203s%20timer%203.mp3" preload="auto"></audio>
+<audio id="countEnd"  src="/sfx/tick%203s%20timer%202.mp3" preload="auto"></audio>
+<audio id="timerTick" src="/sfx/timer%20tick.mp3" preload="auto"></audio>
+<audio id="timesup" src="/sfx/times_up.mp3" preload="auto"></audio>
 
 <script>
 (function(){
@@ -368,6 +401,16 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:h
   [countBeep, countEnd, timerTick, timesup].forEach(a => a.load());
   const playSound = a => { a.currentTime = 0; a.play().catch(()=>{}); };
 
+  function audioReady(audio) {
+    return new Promise(resolve => {
+        if (audio.readyState >= 4) {
+            resolve();
+        } else {
+            audio.addEventListener('canplaythrough', resolve, { once: true });
+        }
+    });
+  }
+
   // === slide switching ===
   function showSlide(i) {
     if (busy || i === activeIndex || i < 0 || i >= slides.length) return;
@@ -378,12 +421,20 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:h
     const next = slides[i];
     next.classList.add("active");
     setTimeout(() => { from.classList.remove("exit"); activeIndex = i; busy = false; }, 800);
+    if (i === 0) {
+      document.body.classList.remove('hide-cursor');
+    } else {
+      document.body.classList.add('hide-cursor');
+    }
   }
 
   // === slide 3 countdown ===
   let countdownRunning = false;
-  function startCountdown(slide) {
+  async function startCountdown(slide) {
     if (activeIndex !== 3 || countdownRunning) return;
+    
+    await Promise.all([audioReady(countBeep), audioReady(countEnd)]);
+
     countdownRunning = true;
     const title = document.getElementById("slide3Title");
     title.classList.add("hidden");
@@ -492,6 +543,7 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:h
       if(raf)cancelAnimationFrame(raf);
       timerEl.classList.add("paused");
       setRed();
+      playSound(timesup);
     }
 
     function reset(){
@@ -512,12 +564,16 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:h
     }
     
     function updateTotal(newTotalSeconds) {
+        if (newTotalSeconds === totalSeconds) return;
         totalSeconds = newTotalSeconds;
         reset();
     }
 
-    function showOverlay(){
+    async function showOverlay(){
       if(overlayActive||countdownRunning)return;
+
+      await Promise.all([audioReady(countBeep), audioReady(countEnd)]);
+
       overlayActive=true;countdownRunning=true;
       overlay=document.createElement("div");
       overlay.className="timer-overlay";slideEl.appendChild(overlay);
@@ -625,6 +681,28 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:h
   // === Initial Load ===
   loadSettings();
 
+  document.getElementById('reset-settings-btn').addEventListener('click', () => {
+    const defaultTimer1 = 20;
+    const defaultTimer2 = 10;
+
+    // Update input fields
+    timer1MinutesInput.value = defaultTimer1;
+    timer2MinutesInput.value = defaultTimer2;
+
+    // Update timer variables
+    timer1Minutes = defaultTimer1;
+    timer2Minutes = defaultTimer2;
+
+    // Update actual timers
+    if (timer4) {
+        timer4.updateTotal(timer1Minutes * 60);
+    }
+    if (timer5) {
+        timer5.updateTotal(timer2Minutes * 60);
+    }
+    saveSettings();
+  });
+
   function currentTimer(){
     if(activeIndex===4)return timer4;
     if(activeIndex===5)return timer5;
@@ -639,6 +717,10 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:h
     }
 
     if (k === 'Escape') {
+        const t = currentTimer();
+        if (t) {
+            t.reset();
+        }
         showSlide(0);
         return;
     }
@@ -650,7 +732,12 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:h
 
     if(k.toLowerCase()==="r"){const t=currentTimer();if(t)t.reset();return;}
     if(countdownRunning)return;
-    if(/^[1-6]$/.test(k)){showSlide(parseInt(k));return;}
+    if(/^[1-6]$/.test(k)){
+        const t = currentTimer();
+        if (t && t.running) return;
+        showSlide(parseInt(k));
+        return;
+    }
 
     if(k===" "){
       const t=currentTimer();if(!t)return;
@@ -659,6 +746,10 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:h
     }
 
     if(k==="Enter"){
+      if (activeIndex === 3) {
+        startCountdown(slides[3]);
+        return;
+      }
       const t=currentTimer();if(!t)return;
       if(t.overlayActive)t.removeOverlay();else t.showOverlay();
       return;
@@ -670,11 +761,13 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:h
     const t=e.touches[0];startX=t.clientX;startY=t.clientY;
   },{passive:true});
   window.addEventListener("touchend",e=>{
-    if(countdownRunning)return;
+    if(countdownRunning || activeIndex === 0)return;
     const t=e.changedTouches[0];
     const dx=t.clientX-startX,dy=t.clientY-startY;
     const absX=Math.abs(dx),absY=Math.abs(dy);
     if(absX>50&&absX>absY){
+      const timer = currentTimer();
+      if (timer && timer.running) return;
       if(dx>0)showSlide(activeIndex-1);else showSlide(activeIndex+1);
     }else if(absY>50&&absY>absX){
       const timer=currentTimer();
