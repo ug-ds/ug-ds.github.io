@@ -305,13 +305,59 @@ body.hide-cursor {
 }
 input:checked + .slider { background-color: var(--accent); }
 input:checked + .slider:before { transform: translateX(26px); }
+
+.home-logo-link {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  width: 120px;
+  z-index: 10;
+  transition: transform 0.3s ease;
+}
+.home-logo-link:hover {
+  transform: scale(1.05);
+}
+.home-logo-link img {
+  width: 100%;
+}
+.mobile-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: var(--bg);
+  color: var(--text);
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 1.5rem;
+  z-index: 1000;
+  padding: 2rem;
+  font-family: "Noto Sans Georgian", sans-serif;
+}
+.mobile-overlay-icon {
+    font-size: 5rem;
+    margin-bottom: 1rem;
+}
+@media (hover: none) and (pointer: coarse), (max-width: 1200px) {
+  .mobile-overlay {
+    display: flex;
+  }
+}
 </style>
 </head>
 
 <body>
+<div class="mobile-overlay">
+  <div class="mobile-overlay-icon">⚠️</div>
+  <div>This website is not supported on mobile devices. Please use a desktop browser.</div>
+</div>
 <div class="slides">
   
   <section class="slide active" id="slide-0">
+    <a href="https://ug-ds.github.io" class="home-logo-link">
+      <img src="https://raw.githubusercontent.com/ug-ds/ug-ds.github.io/761a9da78b14f5bafe56827eaed0f8e0d54bead8/assets/ug%20ds%20logo%20svg.svg" alt="Home Logo">
+    </a>
     <div class="settings-container">
       <div class="setting">
         <label for="timer1-minutes">First Timer (min)</label>
