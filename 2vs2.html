@@ -760,6 +760,7 @@ body.hide-cursor {
           connectionStatus.textContent = 'Remote Connected!';
           connectionStatus.style.color = 'lightgreen';
           console.log('Connected to remote: ' + conn.peer);
+          conn.send({ type: 'presentation-id', id: '2vs2' });
 
           conn.on('data', handleRemoteCommand);
           conn.on('close', () => {
@@ -790,6 +791,11 @@ body.hide-cursor {
               break;
           case 'resetTimer':
               if (t) t.reset();
+              break;
+          // Note: 2v2 doesn't have countdown/overlay, so no case for them.
+          // We can add a case for 'Enter' to start the presentation from slide 0.
+          case 'special': // The old 'special' button with param 'Enter'
+              if (param === 'Enter' && activeIndex === 0) showSlide(4);
               break;
       }
   }
