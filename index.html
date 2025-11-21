@@ -12,6 +12,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@100..900&family=Saira:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,700,1,200" />
+  <!-- Smooth Scrollbar -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/smooth-scrollbar@8.8.4/dist/smooth-scrollbar.css">
+  <script src="https://cdn.jsdelivr.net/npm/smooth-scrollbar@8.8.4/dist/smooth-scrollbar.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/smooth-scrollbar@8.8.4/dist/plugins/overscroll.js"></script>
   <style>
     /* Apply Saira font only to Latin characters */
     @font-face {
@@ -25,16 +29,37 @@
   <style>
     :root {
       --bg: #0C1A22;
-      --accent: #ED3737;
-      --text-muted: #e6e6e6;
-      --text: #ff3333;
+      --accent: #ff2f2f;
+      --text-muted: #e7e7e7;
+      --text: #fff;
     }
+
+    html{
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    }
+
+      ::-webkit-scrollbar {
+      width: 20px;
+    }
+
+    ::-webkit-scrollbar-track {
+        border: solid 3px transparent;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        box-shadow: inset 0 0 10px 20px var(--accent);
+        border: solid 6px transparent;
+        border-radius: 20px;
+    }
+
 
     body {
       background-color: var(--bg);
       color: var(--text);
       font-family: sans-serif;
-      margin: 0;
       padding: 0;
       scroll-behavior: smooth;
       font-family: "Noto Sans Georgian", sans-serif;
@@ -43,10 +68,15 @@
 
     .navbar {
       padding: 0.1rem 1rem;
-      background-color: #081218;
+      background-color: transparent;
       display: flex;
       justify-content: space-between;
       align-items: center;
+    }
+
+    .nav-reveal-container {
+      overflow: hidden;
+      padding: 2px 0; /* Add a little space to prevent clipping */
     }
 
     .nav-links {
@@ -60,7 +90,9 @@
       font-family: "Saira", sans-serif;
       font-weight: 600;
       font-size: 1.1rem;
-      transition: color 0.2s ease;
+      transition: color 0.2s ease, transform 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+      transform: translateY(110%);
+      display: block;
     }
 
     .nav-link:hover, .nav-link.active {
@@ -72,12 +104,163 @@
     .logo-link {
       display: inline-block;
       vertical-align: middle;
+      transform: translateY(110%);
+      transition: transform 1.5s cubic-bezier(0.19, 1, 0.22, 1);
     }
 
     .logo-img {
       height: 90px;
       display: block;
       transition: transform 0.2s ease;
+    }
+
+    /* Hero Section Styles */
+    .hero-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      height: calc(100vh - 90px); /* Full viewport height minus navbar */
+      align-items: center;
+      padding: 0 2rem;
+      overflow: hidden;
+    }
+
+    .hero-logo-img {
+      /* width is now set by JS to match title height */
+      height: auto;
+      opacity: 0; /* Initially hidden */
+      transform: translateX(120%);
+      /* Animation is now triggered by JS */
+    }
+
+    .hero-left {
+      display: flex;
+      justify-content: flex-end;
+      padding-right: 2rem;
+      align-items: center; /* Vertically center the logo */
+      overflow: hidden;
+
+    }
+
+    .hero-logo-img.animate-in {
+      opacity: 1;
+      animation: revealLogo 1.5s cubic-bezier(0.1,0.6,.1,1) forwards;
+    }
+
+    .hero-right {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-left: 2rem;
+    }
+
+    .hero-title {
+      font-family: "Saira", sans-serif;
+      font-size: clamp(3rem, 10vw, 7rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin: 0;
+    }
+
+    .hero-title-line {
+      overflow: hidden;
+    }
+
+    .hero-title span {
+      display: block;
+      transform: translateY(110%);
+      /* Animation is now triggered by JS */
+    }
+    .hero-title span.animate-text-in {
+      animation: revealText 1.5s cubic-bezier(0,1.01,.42,1) forwards;
+    }
+
+
+    .hero-title .hero-title-line:nth-child(2) span.animate-text-in { animation-delay: 0.3s; }
+    .hero-title .hero-title-line:nth-child(3) span.animate-text-in { animation-delay: 0.6s; }
+
+    @keyframes revealText {
+      to {
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes revealLogo {
+      to {
+        transform: translateX(0);
+      }
+    }
+
+    .reveal-container {
+      overflow: hidden;
+    }
+
+    .about-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      padding: 6rem 4rem;
+      max-width: 1400px;
+      margin: auto;
+      align-items: center;
+      opacity: 0; /* Hide until observed */
+      transition: opacity 0.5s ease;
+    }
+
+    .about-title {
+      font-family: "Saira", sans-serif;
+      font-size: clamp(3.5rem, 6vw, 6rem);
+      font-weight: 700;
+      text-align: center;
+      color: var(--accent);
+      transform: translateY(110%);
+      transition: transform 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+    }
+
+    .about-title.animate-title-in {
+      transform: translateY(0);
+    }
+
+    .section-title {
+      font-family: "Saira", sans-serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 3rem;
+      transform: translateY(110%);
+      transition: transform 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+    }
+
+    .section-title.animate-title-in {
+      transform: translateY(0);
+    }
+
+    .about-left {
+      text-align: center;
+    }
+
+    .about-text {
+      font-family: "Noto Sans Georgian", sans-serif;
+      text-transform: uppercase;
+      font-size: 1.7rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    .about-text-word-wrapper {
+      overflow: hidden;
+      display: inline-block; /* Allows words to wrap naturally */
+      margin-right: 0.4em; /* Space between words */
+      line-height: 1.7; /* Keep the line height */
+    }
+
+    .about-text-word {
+      display: block;
+      transform: translateY(110%);
+      transition: transform 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+    }
+
+    .about-text-word.animate-text-in {
+      transform: translateY(0);
     }
 
     main {
@@ -93,71 +276,11 @@
       justify-content: center;
     }
 
-    .cover-image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
-      position: absolute;
-      z-index: -1;
-      filter: blur(10px) brightness(1);
-      transform: scale(1.2);
-      opacity: 0;
-      animation: fadeInCover 1s ease-out forwards;
-      animation-delay: 0.2s;
-    }
-
-    @keyframes fadeInCover {
-      to {
-        filter: blur(0) brightness(1);
-        transform: scale(1);
-        opacity: 1;
-      }
-    }
-
-    @keyframes fadeInUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .page-intro {
-      text-align: center;
-      padding: 4rem 2rem;
-      background-color: #0f1e28;
-    }
-
-    .page-title {
-      font-family: "Noto Sans Georgian", "Saira", sans-serif; /* Saira for English, Noto for Georgian */
-      font-size: clamp(2rem, 5vw, 3.5rem);
-      font-weight: 800;
-      margin: 0 0 1rem 0;
-      color: var(--text);
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeInUp 0.8s ease-out forwards;
-      animation-delay: 0.8s; /* Starts after cover image */
-    }
-
-    .page-description {
-      font-size: clamp(1rem, 2vw, 1.2rem);
-      color: var(--text-muted);
-      max-width: 800px;
-      margin: 0 auto;
-      line-height: 1.6;
-      opacity: 0;
-      transform: translateY(20px);
-      animation: fadeInUp 0.8s ease-out forwards;
-      animation-delay: 1s; /* Starts after title */
-    }
-
     .games-section {
       padding: 4rem 2rem;
       max-width: 1200px;
       margin: auto;
       opacity: 0; /* Initially hidden for scroll animation */
-      transform: translateY(40px);
       transition: opacity 0.8s ease-out, transform 0.8s ease-out;
     }
 
@@ -209,12 +332,19 @@
     }
 
     .card-description {
-        font-size: 1rem;
+        font-size: 1.3rem;
         color: var(--text-muted);
-        line-height: 1.4;
+        line-height: 1.1;
         margin: 0;
         flex-grow: 1;
     }
+
+    .gallery-button {
+      transform: translateY(100px);
+      opacity: 0;
+      transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+    }
+
 
     .gallery-button:hover {
       transform: translateY(-2px);
@@ -231,7 +361,9 @@
     .remote-link {
       color: var(--text-muted);
       text-decoration: none;
-      transition: color 0.2s ease, transform 0.2s ease;
+      transition: color 0.2s ease, transform 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+      transform: translateY(110%);
+      display: block;
     }
     .remote-link:hover {
       color: var(--accent);
@@ -248,30 +380,10 @@
     }
 
     footer {
-      background-color: #081218;
+      background-color: transparent;
       padding: 2rem;
       text-align: center;
       margin-top: 4rem;
-      border-top: 1px solid hsl(202, 38%, 20%);
-    }
-
-    .social-links {
-      display: flex;
-      justify-content: center;
-      gap: 1.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .social-link {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 1.1rem;
-      font-weight: 600;
-      transition: color 0.2s ease;
-    }
-
-    .social-link:hover {
-      color: var(--accent);
     }
 
     .footer-text {
@@ -279,6 +391,16 @@
       font-size: 0.9rem;
     }
 
+    .footer-reveal-container {
+      overflow: hidden;
+    }
+    .footer .animate-item {
+      transform: translateY(110%);
+      transition: transform 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+    }
+    .footer .animate-item.animate-in {
+      transform: translateY(0);
+    }
     /* Mobile Adjustments */
     @media (max-width: 768px) {
       .cover-container {
@@ -297,34 +419,56 @@
 <body>
 
   <nav class="navbar">
-    <a href="index.html" class="logo-link">
-      <img src="https://raw.githubusercontent.com/ug-ds/ug-ds.github.io/761a9da78b14f5bafe56827eaed0f8e0d54bead8/assets/ug%20ds%20logo%20svg.svg" alt="UGDS Logo" class="logo-img">
-    </a>
-    <div class="nav-links">
-      <a href="https://www.facebook.com/people/UG-Debating-Society/61573906987205/" target="_blank" class="nav-link">Facebook</a>
-      <a href="https://www.instagram.com/ug_d.s/" target="_blank" class="nav-link">Instagram</a>
+    <div class="nav-reveal-container">
+      <a href="index.html" class="logo-link">
+        <img src="https://raw.githubusercontent.com/ug-ds/ug-ds.github.io/761a9da78b14f5bafe56827eaed0f8e0d54bead8/assets/ug%20ds%20logo%20svg.svg" alt="UGDS Logo" class="logo-img">
+      </a>
     </div>
-    <a href="remote.html" class="remote-link" title="Open Remote Control" target="_blank">
-      <span class="material-symbols-outlined">remote_gen</span>
-    </a>
+    <div class="nav-links">
+      <div class="nav-reveal-container"><a href="https://www.facebook.com/people/UG-Debating-Society/61573906987205/" target="_blank" class="nav-link">Facebook</a></div>
+      <div class="nav-reveal-container"><a href="https://www.instagram.com/ug_d.s/" target="_blank" class="nav-link">Instagram</a></div>
+      <div class="nav-reveal-container"><a href="https://ug.edu.ge/" target="_blank" class="nav-link">UG</a></div>
+    </div>
+    <div class="nav-reveal-container">
+      <a href="remote.html" class="remote-link" title="Open Remote Control" target="_blank">
+        <span class="material-symbols-outlined">remote_gen</span>
+      </a>
+    </div>
   </nav>
 
   <main>
-    <section class="cover-container">
-      <img src="assets/ug-ds-web-cover.png" alt="Debating event cover" class="cover-image">
+    <section class="hero-section">
+      <div class="hero-left">
+        <img src="https://raw.githubusercontent.com/ug-ds/ug-ds.github.io/main/assets/ug%20ds%20logo%20for%20cover.svg" alt="UGDS Logo" class="hero-logo-img">
+      </div>
+      <div class="hero-right">
+        <h1 class="hero-title">
+          <div class="hero-title-line" style="color: var(--accent);"><span>UG</span></div>
+          <div class="hero-title-line"><span>DEBATING</span></div>
+          <div class="hero-title-line"><span>SOCIETY</span></div>
+        </h1>
+      </div>
     </section>
 
-    <section class="page-intro">
-      <h1 class="page-title">საქართველოს უნივერსიტეტის დებატების კლუბი</h1>
-      <p class="page-description">
-        ჩვენი კლუბი არის ადგილი, სადაც სტუდენტებს შეუძლიათ განავითარონ კრიტიკული აზროვნება, საჯარო გამოსვლების უნარები და ჩაერთონ საინტერესო დისკუსიებში.
-      </p>
+    <section class="about-section">
+      <div class="about-left">
+        <div class="reveal-container">
+          <h2 class="about-title">ABOUT US</h2>
+        </div>
+      </div>
+      <div class="about-right">
+        <div class="about-text">
+          ჩვენი კლუბი არის ადგილი, სადაც სტუდენტებს შეუძლიათ განავითარონ კრიტიკული აზროვნება, საჯარო გამოსვლების უნარები და ჩაერთონ საინტერესო დისკუსიებში. ჩვენი მიზანია, შევქმნათ ინტელექტუალური და მხარდამჭერი გარემო, რომელიც ხელს შეუწყობს იდეების თავისუფალ გაცვლას და პიროვნულ ზრდას.
+        </div>
+      </div>
     </section>
 
     <div class="games-section">
-      <h2 class="page-title" style="text-align: center; margin-bottom: 3rem;">დებატების ფორმატები</h2>
+      <div class="reveal-container">
+        <h2 class="section-title">DEBATING SLIDES</h2>
+      </div>
       <div id="button-gallery" class="gallery">
-        <!-- Buttons will be inserted here by the script -->
+        <!-- Cards will be inserted here by the script -->
       </div>
     </div>
   </main>
@@ -335,13 +479,13 @@
         name: "1 VS N", 
         url: "1vsN.html", 
         description: "ჩარლი კირკის მსგავსი დებატები, სადაც ერთი ადამიანი კონკრეტული დროის განმავლობაში ედებატება რამოდენიმე მოწინააღმდეგეს",
-        image: "assets/IMG-1VSN.svg"
+        image: "https://raw.githubusercontent.com/ug-ds/ug-ds.github.io/main/assets/IMG-1VSN.svg"
       },
       { 
         name: "2 VS 2", 
         url: "2vs2.html", 
         description: "2-2 ზე დებატები, სადაც გუნდურად ედებატება ორი ადამიანი",
-        image: "assets/IMG-2VS2.svg"
+        image: "https://raw.githubusercontent.com/ug-ds/ug-ds.github.io/main/assets/IMG-2VS2.svg"
       },
     ];
 
@@ -366,36 +510,217 @@
   <script>
     // Scroll-triggered fade-in animation for the games section
     document.addEventListener('DOMContentLoaded', () => {
-      const gamesSection = document.querySelector('.games-section');
+        const gamesSection = document.querySelector('.games-section');
+        const gamesTitle = document.querySelector('.games-section .section-title');
+        const galleryButtons = document.querySelectorAll('.gallery-button');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    gamesSection.style.opacity = '1';
+                    gamesTitle.classList.add('animate-title-in');
+                    galleryButtons.forEach((button, index) => {
+                        setTimeout(() => {
+                            button.style.opacity = '1';
+                            button.style.transform = 'translateY(0)';
+                        }, 300 + 150 * index); // Stagger the animation, start after title
+                    });
+                } else {
+                    // Reset when out of view
+                    gamesTitle.classList.remove('animate-title-in');
+                    galleryButtons.forEach(button => {
+                        button.style.opacity = '0';
+                        button.style.transform = 'translateY(100px)';
+                    });
+                }
+            });
+        }, {
+            threshold: 0.2
+        });
+
+        if (gamesSection) observer.observe(gamesSection);
+    });
+  </script>
+
+  <script>
+    // Scroll-triggered animation for the about section
+    document.addEventListener('DOMContentLoaded', () => {
+      const aboutSection = document.querySelector('.about-section');
+      const aboutTitle = document.querySelector('.about-title');
+      const aboutTextContainer = document.querySelector('.about-text');
+      let aboutTextWords = [];
+
+      // Wrap each word in a span for animation
+      if (aboutTextContainer) {
+        const text = aboutTextContainer.textContent.trim();
+        aboutTextContainer.innerHTML = text.split(/\s+/).map(word => 
+          `<span class="about-text-word-wrapper"><span class="about-text-word">${word}</span></span>`
+        ).join(' ');
+        aboutTextWords = document.querySelectorAll('.about-text-word');
+      }
 
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-            observer.unobserve(entry.target); // Stop observing once it's visible
+            aboutSection.style.opacity = '1';
+            aboutTitle.classList.add('animate-title-in');
+            aboutTextWords.forEach((word, index) => {
+              // Stagger the animation for each word
+              setTimeout(() => {
+                word.classList.add('animate-text-in');
+              }, 300 + index * 50); // Start after title, with a small delay between words
+            });
+          } else {
+            // Reset when out of view
+            aboutTitle.classList.remove('animate-title-in');
+            aboutTextWords.forEach(word => word.classList.remove('animate-text-in'));
           }
         });
       }, {
-        threshold: 0.1 // Trigger when 10% of the element is visible
+        threshold: 0.3
       });
 
-      if (gamesSection) {
-        observer.observe(gamesSection);
+      if (aboutSection) {
+        observer.observe(aboutSection);
       }
     });
   </script>
 
+
+  <script>
+    // Animate nav items in ONCE on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      const navItems = [
+        document.querySelector('.navbar .logo-link'),
+        ...document.querySelectorAll('.navbar .nav-link'),
+        document.querySelector('.navbar .remote-link')
+      ];
+
+      const startDelay = 1200; // Start after hero animation has begun
+      const stagger = 150; // Delay between each item
+
+      navItems.forEach((item, index) => {
+        if (item) {
+          setTimeout(() => { item.style.transform = 'translateY(0)'; }, startDelay + (index * stagger));
+        }
+      });
+    });
+  </script>
+
+  <script>
+    // Hero and Nav animation controller
+    document.addEventListener('DOMContentLoaded', () => {
+      const heroSection = document.querySelector('.hero-section');
+      const title = document.querySelector('.hero-title');
+      const logo = document.querySelector('.hero-logo-img');
+      const titleSpans = document.querySelectorAll('.hero-title span');
+
+      function runHeroAnimations() {
+        // 1. Size logo and start its animation
+        const titleHeight = title.offsetHeight;
+        logo.style.height = `${titleHeight}px`;
+        logo.style.width = 'auto';
+
+        logo.classList.add('animate-in');
+
+        // 2. Start text animation
+        setTimeout(() => {
+          titleSpans.forEach(span => { span.classList.add('animate-text-in'); });
+        }, 300);
+      }
+
+      function resetHeroAnimations() {
+        logo.classList.remove('animate-in');
+        titleSpans.forEach(span => span.classList.remove('animate-text-in'));
+      }
+
+      const heroObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) { // When the hero section is visible
+            runHeroAnimations();
+          } else {
+            resetHeroAnimations(); // Reset when scrolling away
+          }
+        });
+      }, { threshold: 0.1 });
+
+      heroObserver.observe(heroSection);
+    });
+  </script>
+
+  <script>
+    // Smooth Scrolling
+    document.addEventListener('DOMContentLoaded', () => {
+      var OverscrollPlugin = window.Scrollbar.OverscrollPlugin;
+
+      Scrollbar.use(OverscrollPlugin);
+
+      const overscrollOptions = {
+        enable: true,
+        effect: 'bounce',
+        damping: 0.15,
+        maxOverscroll: 150,
+        glowColor: '#fff',
+      };
+      
+      const options = {
+          damping : 0.07,
+          plugins: {
+            overscroll: { ...overscrollOptions },
+          },
+      };
+
+      const scrollbar = Scrollbar.init(document.body, options);
+
+      // This is important to make sure anchor links and other scroll events work with the virtual scrollbar
+      // For example, if you add a "scroll to top" button.
+      // Not strictly needed now, but good for future-proofing.
+    });
+  </script>
+
   <footer>
-    <div class="social-links">
-      <a href="https://www.facebook.com/people/UG-Debating-Society/61573906987205/" target="_blank" class="social-link">Facebook</a>
-      <a href="https://www.instagram.com/ug_d.s/" target="_blank" class="social-link">Instagram</a>
-      <a href="https://ug.edu.ge/" target="_blank" class="social-link">UG</a>
+    <div class="footer-reveal-container">
+      <p class="footer-text" id="footer-copyright">
+        &copy; <span id="footer-year"></span> University of Georgia Debating Society. All rights reserved.
+      </p>
     </div>
-    <p class="footer-text">
-      &copy; 2025 University of Georgia Debating Society. All rights reserved.
-    </p>
   </footer>
+
+  <script>
+    // Footer animation controller
+    document.addEventListener('DOMContentLoaded', () => {
+      const yearSpan = document.getElementById('footer-year');
+      if (yearSpan) yearSpan.textContent = new Date().getFullYear();
+
+      const footer = document.querySelector('footer');
+      const copyrightText = footer.querySelector('.footer-text');
+      const footerItems = [copyrightText];
+
+      // Add class for CSS targeting
+      footerItems.forEach(item => item.classList.add('animate-item'));
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            footerItems.forEach((item, index) => {
+              item.style.transitionDelay = `${index * 150}ms`;
+              item.classList.add('animate-in');
+            });
+          } else {
+            footerItems.forEach(item => {
+              item.classList.remove('animate-in');
+            });
+          }
+        });
+      }, {
+        threshold: 0.5 // Trigger when 50% of the footer is visible
+      });
+
+      if (footer) {
+        observer.observe(footer);
+      }
+    });
+  </script>
 
 </body>
 </html>
