@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>1 vs N</title>
-<link rel="icon" type="image/x-icon" href="/assets/ug ds logo favicon.png">
+<link rel="icon" type="image/png" href="/assets/ug ds logo favicon.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -382,22 +382,22 @@ input:checked + .slider:before { transform: translateX(26px); }
           <span class="slider"></span>
         </label>
       </div>
-      <button id="reset-settings-btn" class="reset-button">Reset to Default</button>
+      <button id="reset-settings-btn" class="reset-button">RESET</button>
     </div>
     <div class="start-prompt">press enter to start</div>
     <div class="version-display" id="version-display"></div>
-    <div id="remote-control-container" style="position: absolute; bottom: 2rem; left: 2rem; background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; z-index: 20; display: flex; align-items: center; gap: 1rem;">
-      <div>
+    <div id="remote-control-container" style="position: absolute; bottom: 2rem; left: 2rem; background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; z-index: 20; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+      <div id="qr-code-container" style="z-index: 21; order: 1;">
+        <a id="qr-code-link" href="https://ug-ds.github.io/remote" target="_blank"><img id="qr-code-img" src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://ug-ds.github.io/remote&color=ED3737&bgcolor=0C1A22&qzone=1" alt="Remote QR Code" style="border: 4px solid var(--accent); border-radius: 8px;"></a>
+      </div>
+      <div style="order: 2; text-align: center;">
         <h3 style="margin: 0 0 0.5rem 0; font-size: 1.2rem; color: var(--accent);">Remote Code</h3>
-        <div id="peer-id-display" style="font-family: 'Saira', sans-serif; font-size: 2.5rem; letter-spacing: 3px; color: #fff;">
+        <div id="peer-id-display" style="font-family: 'Saira', sans-serif; font-size: 3rem; letter-spacing: 3px; color: #fff;">
           ------
         </div>
         <div id="connection-status" style="margin-top: 0.5rem; color: #999; height: 1em;">
           Waiting for connection...
         </div>
-      </div>
-      <div id="qr-code-container" style="z-index: 21;">
-        <a id="qr-code-link" href="https://ug-ds.github.io/remote" target="_blank"><img id="qr-code-img" src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://ug-ds.github.io/remote&color=ED3737&bgcolor=0C1A22&qzone=1" alt="Remote QR Code" style="border: 4px solid var(--accent); border-radius: 8px;"></a>
       </div>
     </div>
   </section>
@@ -864,7 +864,7 @@ input:checked + .slider:before { transform: translateX(26px); }
           const qrImg = document.getElementById('qr-code-img');
           const remoteUrl = `https://ug-ds.github.io/remote?code=${code}`;
           qrLink.href = remoteUrl;
-          qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(remoteUrl)}&color=ED3737&bgcolor=0C1A22&qzone=1`;
+          qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(remoteUrl)}&color=ED3737&bgcolor=0C1A22&qzone=1`;
       });
 
       peer.on('connection', newConn => {
