@@ -433,13 +433,18 @@ body.hide-cursor {
       </div>
       <button id="reset-settings-btn" class="reset-button">დაბრუნება</button>
     </div>
-    <div id="remote-control-container" style="position: absolute; bottom: 2rem; left: 2rem; background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; text-align: center;">
-      <h3 style="margin: 0 0 0.5rem 0; font-size: 1.2rem; color: var(--accent);">Remote Code</h3>
-      <div id="peer-id-display" style="font-family: 'Saira', sans-serif; font-size: 2.5rem; letter-spacing: 3px; color: #fff;">
-        ------
+    <div id="remote-control-container" style="position: absolute; bottom: 2rem; left: 2rem; background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; z-index: 20; display: flex; align-items: center; gap: 1rem;">
+      <div>
+        <h3 style="margin: 0 0 0.5rem 0; font-size: 1.2rem; color: var(--accent);">Remote Code</h3>
+        <div id="peer-id-display" style="font-family: 'Saira', sans-serif; font-size: 2.5rem; letter-spacing: 3px; color: #fff;">
+          ------
+        </div>
+        <div id="connection-status" style="margin-top: 0.5rem; color: #999; height: 1em;">
+          Waiting for connection...
+        </div>
       </div>
-      <div id="connection-status" style="margin-top: 0.5rem; color: #999; height: 1em;">
-        Waiting for connection...
+      <div id="qr-code-container" style="z-index: 21;">
+        <a id="qr-code-link" href="https://ug-ds.github.io/remote" target="_blank"><img id="qr-code-img" src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://ug-ds.github.io/remote&color=ED3737&bgcolor=0C1A22&qzone=1" alt="Remote QR Code" style="border: 4px solid var(--accent); border-radius: 8px;"></a>
       </div>
     </div>
     <div class="start-prompt">press enter to start</div>
@@ -774,6 +779,11 @@ body.hide-cursor {
       peer.on('open', id => {
           console.log('My peer ID is: ' + id);
           peerIdDisplay.textContent = code;
+          const qrLink = document.getElementById('qr-code-link');
+          const qrImg = document.getElementById('qr-code-img');
+          const remoteUrl = `https://ug-ds.github.io/remote?code=${code}`;
+          qrLink.href = remoteUrl;
+          qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(remoteUrl)}&color=ED3737&bgcolor=0C1A22&qzone=1`;
       });
 
       peer.on('connection', newConn => {

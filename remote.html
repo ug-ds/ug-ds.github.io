@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Remote</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Saira:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #0C1A22;
@@ -31,12 +32,35 @@
             padding: 1rem;
             box-sizing: border-box;
         }
+        .hero-title {
+            font-family: "Saira", sans-serif;
+            font-size: clamp(3rem, 10vw, 4rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin: 0;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .hero-title-line {
+            overflow: hidden;
+        }
+
+        .hero-title span {
+            display: block;
+            transform: translateY(110%);
+            transition: transform 1.5s cubic-bezier(0,1.01,.42,1);
+        }
+
+        .hero-title span.animate-text-in {
+            transform: translateY(0);
+        }
         #connect-view {
             text-align: center;
-        }
-        #connect-view h1 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         #code-input {
             font-size: 2rem;
@@ -115,8 +139,10 @@
 <body>
 
 <div class="container">
-    <div id="connect-view" style="width: 100%;">
-        <h1>Enter Connection Code</h1>
+    <div id="connect-view">
+        <h1 class="hero-title">
+            <div class="hero-title-line"><span>REMOTE</span></div>
+        </h1>
         <input type="text" id="code-input" maxlength="6" inputmode="numeric" placeholder="______">
         <button id="connect-btn">Connect</button>
         <p id="status"></p>
@@ -283,6 +309,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initializePeer();
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    if (code) {
+        codeInput.value = code;
+        setTimeout(() => {
+            connectBtn.click();
+        }, 500);
+    }
+
     // Set last updated time
     const now = new Date();
     const year = now.getFullYear();
@@ -292,6 +327,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const minute = String(now.getMinutes()).padStart(2, '0');
     const lastUpdated = `${year}-${month}-${day} ${hour}:${minute}`;
     document.getElementById('version-display').textContent = `Updated: ${lastUpdated}`;
+
+    const titleSpans = document.querySelectorAll('.hero-title span');
+    setTimeout(() => {
+        titleSpans.forEach(span => { span.classList.add('animate-text-in'); });
+    }, 300);
 });
 </script>
 
