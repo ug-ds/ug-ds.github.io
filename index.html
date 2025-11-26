@@ -86,10 +86,17 @@
 
   <style>
     :root {
-      --bg: #0C1A22;
-      --accent: #ff3939;
+      --bg: #041016;
+      --accent: #FF4633;
       --text-muted: #e7e7e7;
       --text: #fff;
+      --selection-bg: #FF4633;
+      --selection-text: #fff;
+    }
+
+    ::selection {
+      background-color: var(--selection-bg);
+      color: var(--selection-text);
     }
 
     html{
@@ -121,6 +128,7 @@
       padding: 0;
       scroll-behavior: smooth;
       font-family: "Noto Sans Georgian", sans-serif;
+      
     }
 
 
@@ -146,15 +154,20 @@
       color: var(--text-muted);
       text-decoration: none;
       font-family: "Saira", sans-serif;
-      font-weight: 600;
-      font-size: 1.1rem;
-      transition: color 0.2s ease, transform 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+      font-weight: 400;
+      font-size: 1.3rem;
+      transition: 0.2s ease, transform 1.5s cubic-bezier(0.19, 1, 0.22, 1);
       transform: translateY(110%);
       display: block;
+      border: #fff 2px solid;
+      padding: 10px 30px;
+      border-radius: 90px;
     }
 
     .nav-link:hover, .nav-link.active {
-      color: var(--accent);
+      background-color: #fff;
+      color: var(--bg);
+      font-weight: 600;
     }
 
 
@@ -163,13 +176,17 @@
       display: inline-block;
       vertical-align: middle;
       transform: translateY(110%);
-      transition: transform 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+      transition:  transform 1.5s cubic-bezier(0.19, 1, 0.22, 1);
     }
 
     .logo-img {
       height: 90px;
       display: block;
-      transition: transform 0.2s ease;
+      transition: 0.2s ease;
+    }
+
+    .logo-img:hover{
+      filter: brightness(10);
     }
 
     /* Hero Section Styles */
@@ -202,6 +219,8 @@
     .hero-logo-img.animate-in {
       opacity: 1;
       animation: revealLogo 1.5s cubic-bezier(0.1,0.6,.1,1) forwards;
+      user-select: none;
+      pointer-events: none;
     }
 
     .hero-right {
@@ -466,6 +485,42 @@
     .footer .animate-item.animate-in {
       transform: translateY(0);
     }
+    /* Color Pickers */
+    .color-pickers {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .color-pickers label {
+      font-family: "Saira", sans-serif;
+      font-size: 1rem;
+    }
+    .color-pickers input[type="color"] {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      width: 30px;
+      height: 30px;
+      border: 2px solid var(--text-muted);
+      border-radius: 50%;
+      cursor: pointer;
+      padding: 0;
+      background-color: transparent;
+    }
+    .color-pickers input[type="color"]::-webkit-color-swatch-wrapper {
+      padding: 0;
+      border-radius: 50%;
+    }
+    .color-pickers input[type="color"]::-webkit-color-swatch {
+      border: none;
+      border-radius: 50%;
+    }
+    .color-pickers input[type="color"]::-moz-color-swatch {
+      border: none;
+      border-radius: 50%;
+    }
     /* Mobile Adjustments */
     @media (max-width: 1100px) {
       .cover-container {
@@ -524,7 +579,7 @@
       <div class="nav-reveal-container"><a href="https://www.facebook.com/people/UG-Debating-Society/61573906987205/" target="_blank" class="nav-link">Facebook</a></div>
       <div class="nav-reveal-container"><a href="https://www.instagram.com/ug_debating_society/" target="_blank" class="nav-link">Instagram</a></div>
       <div class="nav-reveal-container"><a href="https://ug.edu.ge/" target="_blank" class="nav-link">UG</a></div>
-      <div class="nav-reveal-container"><a href="FAQ.html" class="nav-link">FAQs</a></div>
+      <div class="nav-reveal-container"><a href="FAQ.html" class="nav-link" style="margin-left: 40px;">FAQs</a></div>
     </div>
     <div class="nav-reveal-container">
       <a href="remote.html" class="remote-link" title="Open Remote Control">
@@ -738,6 +793,41 @@
 
       if (footer) {
         observer.observe(footer);
+      }
+    });
+  </script>
+
+  <script>
+    // Color picker functionality
+    document.addEventListener('DOMContentLoaded', () => {
+      const bgColorPicker = document.getElementById('bg-color-picker');
+      const textColorPicker = document.getElementById('text-color-picker');
+      const selectionBgColorPicker = document.getElementById('selection-bg-color-picker');
+      const selectionTextColorPicker = document.getElementById('selection-text-color-picker');
+      const root = document.documentElement;
+
+      if (bgColorPicker) {
+        bgColorPicker.addEventListener('input', (e) => {
+          root.style.setProperty('--bg', e.target.value);
+        });
+      }
+
+      if (textColorPicker) {
+        textColorPicker.addEventListener('input', (e) => {
+          root.style.setProperty('--text', e.target.value);
+        });
+      }
+
+      if (selectionBgColorPicker) {
+        selectionBgColorPicker.addEventListener('input', (e) => {
+          root.style.setProperty('--selection-bg', e.target.value);
+        });
+      }
+
+      if (selectionTextColorPicker) {
+        selectionTextColorPicker.addEventListener('input', (e) => {
+          root.style.setProperty('--selection-text', e.target.value);
+        });
       }
     });
   </script>

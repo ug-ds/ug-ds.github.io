@@ -25,18 +25,27 @@
       color: var(--text-muted);
       text-decoration: none;
       font-family: "Saira", sans-serif;
-      font-weight: 600;
-      font-size: 1.1rem;
-      transition: color 0.2s ease, transform 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+      font-weight: 400;
+      font-size: 1.3rem;
+      transition: 0.2s ease, transform 1.5s cubic-bezier(0.1, 1, 0.3, 1);
       transform: translateY(110%);
       display: block;
+      border: #fff 2px solid;
+      padding: 6px 26px;
+      border-radius: 90px;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      background-color: #fff;
+      color: var(--bg);
+      font-weight: 600;
     }
 
     .logo-link {
       display: inline-block;
       vertical-align: middle;
       transform: translateY(110%);
-      transition: transform 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+      transition: transform 1.5s cubic-bezier(0.1, 1, 0.3, 1);
     }
     
     .faq-item {
@@ -51,8 +60,8 @@
         transform: translateY(0);
     }
     :root {
-      --bg: #0C1A22;
-      --accent: #ff3939;
+      --bg: #041016;
+      --accent: #FF4633;
       --text-muted: #e7e7e7;
       --text: #fff;
     }
@@ -98,10 +107,6 @@
       gap: 2rem;
     }
 
-    .nav-link:hover, .nav-link.active {
-      color: var(--accent);
-    }
-
     .logo-img {
       height: 90px;
     }
@@ -131,23 +136,27 @@
 
     .faq-question {
       font-family: "Noto Sans Georgian", sans-serif;
-      font-size: 1.5rem;
-      font-weight: 600;
+      font-size: 1.8rem;
+      font-weight: 500;
       cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      letter-spacing: 1px;
     }
 
     .faq-answer {
       font-family: "Noto Sans Georgian", sans-serif;
-      font-size: 1.1rem;
+      font-size: 1.4rem;
       line-height: 1.6;
       padding: 0 1rem;
       margin-top: 0;
       max-height: 0;
       overflow: hidden;
-      transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), padding 0.5s cubic-bezier(0.4, 0, 0.2, 1), margin 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      letter-spacing: 1px;
+      word-spacing: 2px;
+      word-break: keep-all;
+      transition: max-height 0.5s cubic-bezier(0.5, 0, 0.5, 1), padding 0.5s cubic-bezier(0.5, 0, 0.5, 1), margin 0.5s cubic-bezier(0.5, 0, 0.5, 1);
     }
     
     .faq-item.active .faq-answer {
@@ -206,8 +215,7 @@
       <div class="nav-reveal-container"><a href="https://www.facebook.com/people/UG-Debating-Society/61573906987205/" target="_blank" class="nav-link">Facebook</a></div>
       <div class="nav-reveal-container"><a href="https://www.instagram.com/ug_d.s/" target="_blank" class="nav-link">Instagram</a></div>
       <div class="nav-reveal-container"><a href="https://ug.edu.ge/" target="_blank" class="nav-link">UG</a></div>
-      <div class="nav-reveal-container" style="margin-left: 2rem;"><a href="slides.html" class="nav-link">SLIDES</a></div>
-      <div class="nav-reveal-container"><a href="FAQ.html" class="nav-link">FAQs</a></div>
+      <div class="nav-reveal-container"><a href="FAQ.html" class="nav-link" style="margin-left: 40px;">FAQs</a></div>
     </div>
   </nav>
 
