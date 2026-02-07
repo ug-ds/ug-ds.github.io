@@ -167,7 +167,7 @@
       font-family: "Saira", sans-serif;
       font-weight: 500;
       font-size: 1.4rem;
-      transition: 0.2s ease, transform 1.5s cubic-bezier(0.1, 1, 0.3, 1);
+      transition: background-color 0.2s ease, color 0.2s ease, transform 1.5s cubic-bezier(0.1, 1, 0.3, 1);
       transform: translateY(110%);
       display: block;
       border: #fff 2px solid;
@@ -574,6 +574,92 @@
         font-size: 1.3rem;
         text-align: left;
       }
+      .faq-section {
+        padding: 4rem 1.5rem;
+      }
+    }
+
+    /* FAQ Styles */
+    .faq-section {
+      padding: 6rem 2rem;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .faq-title-container {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .faq-title-line {
+      overflow: hidden;
+    }
+
+    .faq-title-line span {
+      display: block;
+      font-family: "Saira", sans-serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      color: var(--accent);
+      transform: translateY(110%);
+      transition: transform 1s cubic-bezier(0,1.01,.42,1);
+    }
+
+    .faq-title-line span.animate-text-in {
+      transform: translateY(0);
+    }
+
+    .faq-item {
+      border-bottom: 1px solid #333;
+      padding: 1rem 0;
+      opacity: 0;
+      transform: translateY(50px);
+      transition: opacity 0.8s ease-out, transform 1.1s cubic-bezier(0,.24,.36,1);
+    }
+    .faq-item.animate-in {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .faq-question {
+      font-family: "Noto Sans Georgian", sans-serif;
+      font-size: 1.5rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      letter-spacing: 1px;
+      color: var(--text);
+    }
+
+    .faq-answer {
+      font-family: "Noto Sans Georgian", sans-serif;
+      font-size: 1.2rem;
+      line-height: 1.6;
+      padding: 0 1rem;
+      margin-top: 0;
+      max-height: 0;
+      overflow: hidden;
+      letter-spacing: 1px;
+      word-spacing: 2px;
+      word-break: keep-all;
+      color: var(--text-muted);
+      transition: max-height 0.5s cubic-bezier(0.5, 0, 0.5, 1), padding 0.5s cubic-bezier(0.5, 0, 0.5, 1), margin 0.5s cubic-bezier(0.5, 0, 0.5, 1);
+    }
+    
+    .faq-item.active .faq-answer {
+        max-height: 1000px;
+        margin-top: 1rem;
+        padding: 1rem;
+    }
+
+    .faq-question .icon {
+        transition: transform 0.3s ease;
+    }
+
+    .faq-item.active .faq-question .icon {
+        transform: rotate(45deg);
     }
   </style>
 </head>
@@ -589,12 +675,6 @@
       <div class="nav-reveal-container"><a href="https://www.facebook.com/people/UG-Debating-Society/61573906987205/" target="_blank" class="nav-link">Facebook</a></div>
       <div class="nav-reveal-container"><a href="https://www.instagram.com/ug_debating_society/" target="_blank" class="nav-link">Instagram</a></div>
       <div class="nav-reveal-container"><a href="https://ug.edu.ge/" target="_blank" class="nav-link">UG</a></div>
-      <div class="nav-reveal-container"><a href="FAQ.html" class="nav-link" style="margin-left: 40px;">FAQs</a></div>
-    </div>
-    <div class="nav-reveal-container">
-      <a href="remote.html" class="remote-link" title="Open Remote Control">
-        <span class="material-symbols-outlined">remote_gen</span>
-      </a>
     </div>
   </nav>
 
@@ -622,6 +702,17 @@
         <div class="about-text">
           ჩვენი კლუბი არის ადგილი, სადაც სტუდენტებს შეუძლიათ განავითარონ კრიტიკული აზროვნება, საჯარო გამოსვლების უნარები და ჩაერთონ საინტერესო დისკუსიებში. ჩვენი მიზანია, შევქმნათ ინტელექტუალური და მხარდამჭერი გარემო, რომელიც ხელს შეუწყობს იდეების თავისუფალ გაცვლას და პიროვნულ ზრდას.
         </div>
+      </div>
+    </section>
+
+    <section class="faq-section" id="faq">
+      <div class="faq-title-container">
+          <div class="faq-title-line"><span>FREQUENTLY</span></div>
+          <div class="faq-title-line"><span>ASKED</span></div>
+          <div class="faq-title-line"><span>QUESTIONS</span></div>
+      </div>
+      <div class="faq-container" id="faq-container">
+        <!-- FAQ items will be inserted here -->
       </div>
     </section>
 
@@ -677,8 +768,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       const navItems = [
         document.querySelector('.navbar .logo-link'),
-        ...document.querySelectorAll('.navbar .nav-link'),
-        document.querySelector('.navbar .remote-link')
+        ...document.querySelectorAll('.navbar .nav-link')
       ];
 
       const startDelay = 200; // Start after hero animation has begun
@@ -803,6 +893,69 @@
 
       if (footer) {
         observer.observe(footer);
+      }
+    });
+  </script>
+
+  <script>
+    // FAQ Functionality
+    document.addEventListener('DOMContentLoaded', () => {
+      const faqs = [
+        {
+          question: "რა არის დებატების კლუბი?",
+          answer: "ჩვენი კლუბი არის ადგილი, სადაც სტუდენტებს შეუძლიათ განავითარონ კრიტიკული აზროვნება, საჯარო გამოსვლების უნარები და ჩაერთონ საინტერესო დისკუსიებში. ჩვენი მიზანია, შევქმნათ ინტელექტუალური და მხარდამჭერი გარემო, რომელიც ხელს შეუწყობს იდეების თავისუფალ გაცვლას და პიროვნულ ზრდას."
+        },
+        {
+          question: "როგორ შემიძლია შემოგიერთდეთ?",
+          answer: "ჯგუფში გასაწევრიანებლად მოგვწერეთ ინსტაგრამზე ან დახმარება თხოვეთ სტუდენტურ საქმეთა ცენტრს"
+        },
+        {
+          question: "რა ფორმატის დებატებს ატარებთ?",
+          answer: "ჩვენ ვატარებთ სხვადასხვა ფორმატის დებატებს, მათ შორის ჯგუფური დებატები. იმისთვის, რომ არ გამოგრჩეთ მსგავსი ღონისძიებები, გამოგვყევით Facebook-ზე ან Instagram-ზე"
+        }
+      ];
+
+      const faqContainer = document.getElementById('faq-container');
+      if (faqContainer) {
+        faqs.forEach(faq => {
+          const faqItem = document.createElement('div');
+          faqItem.className = 'faq-item';
+          faqItem.innerHTML = `
+            <div class="faq-question">
+              <span>${faq.question}</span>
+              <span class="icon material-symbols-outlined">add</span>
+            </div>
+            <div class="faq-answer">
+              <p>${faq.answer}</p>
+            </div>
+          `;
+          faqContainer.appendChild(faqItem);
+        });
+
+        faqContainer.addEventListener('click', e => {
+            const faqItem = e.target.closest('.faq-item');
+            if (faqItem) {
+                faqItem.classList.toggle('active');
+            }
+        });
+
+        // Animation Observer
+        const faqObserver = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              if (entry.target.classList.contains('faq-item')) {
+                entry.target.classList.add('animate-in');
+              } else if (entry.target.classList.contains('faq-title-container')) {
+                 const spans = entry.target.querySelectorAll('span');
+                 spans.forEach((span, i) => setTimeout(() => span.classList.add('animate-text-in'), i * 200));
+              }
+            }
+          });
+        }, { threshold: 0.2 });
+
+        document.querySelectorAll('.faq-item').forEach(item => faqObserver.observe(item));
+        const titleContainer = document.querySelector('.faq-title-container');
+        if(titleContainer) faqObserver.observe(titleContainer);
       }
     });
   </script>
