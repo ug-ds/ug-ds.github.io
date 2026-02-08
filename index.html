@@ -574,6 +574,17 @@
       border: none;
       border-radius: 50%;
     }
+
+    .anim-strip-item {
+      height: 1.1em;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .anim-strip-item.geo-text {
+      font-family: "TBCContractica", sans-serif;
+    }
+
     /* Mobile Adjustments */
     @media (max-width: 1100px) {
       .cover-container {
@@ -597,9 +608,6 @@
         background-color: rgba(4, 16, 22, 0.9);
         backdrop-filter: blur(4px);
         padding: 8px 20px;
-      }
-      body{
-        padding: 0 1rem;
       }
       .desktop-text {
         display: none;
@@ -625,6 +633,12 @@
       .hero-right .hero-title-line {
         text-align: center; /* Center each line of the title */
       }
+      .anim-strip-item {
+        justify-content: center;
+      }
+      .anim-strip-item.geo-text {
+        font-size: 0.85em;
+      }
 
       /* About Section Mobile */
       .about-section {
@@ -638,6 +652,11 @@
       .faq-section {
         padding: 4rem 1.5rem;
       }
+
+      .faq-question{
+        font-size: 0.8rem;
+      }
+
       footer {
         padding-bottom: 7rem;
       }
@@ -689,7 +708,7 @@
     }
 
     .faq-question {
-      font-size: 1.5rem;
+      font-size: 1.3rem;
       font-weight: 500;
       cursor: pointer;
       display: flex;
@@ -857,6 +876,7 @@
       const title = document.querySelector('.hero-title');
       const logo = document.querySelector('.hero-logo-img');
       const titleSpans = document.querySelectorAll('.hero-title span');
+      let languageSwitchTimeout;
 
       function runHeroAnimations() {
         // 1. Size logo and start its animation
@@ -869,12 +889,77 @@
         // 2. Start text animation
         setTimeout(() => {
           titleSpans.forEach(span => { span.classList.add('animate-text-in'); });
+          
+          // 3. Trigger Language Switch Animation
+          languageSwitchTimeout = setTimeout(runLanguageSwitch, 2000);
         }, 300);
+      }
+
+      function runLanguageSwitch() {
+        const lines = document.querySelectorAll('.hero-title .hero-title-line');
+        // Target lines: DEBATING (index 1) -> დებატების, SOCIETY (index 2) -> კლუბი
+        const targets = [
+          { lineIndex: 1, text: "დებატების" },
+          { lineIndex: 2, text: "კლუბი" }
+        ];
+
+        targets.forEach((t, i) => {
+          const line = lines[t.lineIndex];
+          const span = line.querySelector('span');
+          if (!span || span.dataset.switched === "true") return;
+
+          const originalText = span.innerText;
+          const targetText = t.text;
+          
+          // Create strip container
+          const strip = document.createElement('div');
+          strip.style.display = 'flex';
+          strip.style.flexDirection = 'column';
+          strip.style.transition = 'transform 1.6s cubic-bezier(.45,0,.4,1)';
+          strip.style.transform = 'translateY(0)';
+
+          // Generate items: Original -> Randoms -> Target
+          const items = [originalText];
+          for (let k = 0; k < 6; k++) items.push(generateRandomString(Math.max(originalText.length, targetText.length)));
+          items.push(targetText);
+
+          items.forEach((txt, idx) => {
+            const div = document.createElement('div');
+            div.textContent = txt;
+            div.className = 'anim-strip-item';
+            if (idx === items.length - 1) {
+              div.classList.add('geo-text');
+            }
+            strip.appendChild(div);
+          });
+
+          // Update span
+          span.innerHTML = '';
+          span.style.display = 'block';
+          span.style.height = '1.1em';
+          span.style.overflow = 'hidden';
+          span.appendChild(strip);
+          span.dataset.switched = "true";
+
+          // Animate
+          setTimeout(() => {
+            const percentage = ((items.length - 1) / items.length) * 100;
+            strip.style.transform = `translateY(-${percentage}%)`;
+          }, 100 + (i * 150));
+        });
+      }
+
+      function generateRandomString(len) {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&∑∏∆◊";
+        let res = "";
+        for (let i = 0; i < len; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
+        return res;
       }
 
       function resetHeroAnimations() {
         logo.classList.remove('animate-in');
         titleSpans.forEach(span => span.classList.remove('animate-text-in'));
+        if (languageSwitchTimeout) clearTimeout(languageSwitchTimeout);
       }
 
       const heroObserver = new IntersectionObserver(entries => {
