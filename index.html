@@ -745,6 +745,124 @@
     .faq-item.active .faq-question .icon {
         transform: rotate(45deg);
     }
+
+    /* News Section Styles */
+    .news-section {
+      padding: 2rem 2rem 4rem 2rem;
+      max-width: 1400px;
+      margin: auto;
+      opacity: 0;
+      transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    }
+
+    .news-title-container {
+      text-align: center;
+      margin-bottom: 6rem;
+    }
+
+    .news-timeline {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+      gap: 1rem;
+      padding-top: 40px;
+    }
+
+    /* The connecting line */
+    .news-timeline::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent);
+      transform: translateY(10px);
+      z-index: 0;
+    }
+
+    .news-card {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      background: transparent;
+      min-width: 0;
+    }
+
+    /* The dot */
+    .news-card::before {
+      content: '';
+      width: 12px;
+      height: 12px;
+      background: var(--accent);
+      border-radius: 50%;
+      position: absolute;
+      top: -35px; /* Position relative to the card top, aligning with the line */
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1;
+      box-shadow: 0 0 0 5px var(--bg); /* Spacing from line */
+    }
+
+    .news-image-container {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+
+    .news-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .news-card:hover .news-image {
+      transform: scale(1.02);
+    }
+
+    .news-card-title {
+      font-family: "Saira", sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text);
+      margin: 0 0 0.5rem 0;
+    }
+
+    .news-card-description {
+      font-size: 1rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    @media (max-width: 900px) {
+      .news-timeline {
+        flex-direction: column;
+        gap: 3rem;
+        padding-left: 2rem;
+        padding-top: 0;
+      }
+      .news-timeline::before {
+        width: 2px;
+        height: 100%;
+        left: 0;
+        top: 0;
+        right: auto;
+        transform: none;
+      }
+      .news-card::before {
+        left: -2rem;
+        top: 0;
+        transform: translateX(-50%);
+        margin-top: 1rem;
+      }
+      .news-card {
+        padding-left: 1rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -789,6 +907,15 @@
         <div class="about-text">
           ჩვენი კლუბი არის ადგილი, სადაც სტუდენტებს შეუძლიათ განავითარონ კრიტიკული აზროვნება, საჯარო გამოსვლების უნარები და ჩაერთონ საინტერესო დისკუსიებში. ჩვენი მიზანია, შევქმნათ ინტელექტუალური და მხარდამჭერი გარემო, რომელიც ხელს შეუწყობს იდეების თავისუფალ გაცვლას და პიროვნულ ზრდას.
         </div>
+      </div>
+    </section>
+
+    <section class="news-section">
+      <div class="news-title-container">
+        <div class="section-title"><span>სიახლეები</span></div>
+      </div>
+      <div class="news-timeline" id="news-container">
+        <!-- News cards will be inserted here by JS -->
       </div>
     </section>
 
@@ -1112,6 +1239,49 @@
       if (footer) {
         observer.observe(footer);
       }
+    });
+  </script>
+
+  <!-- Load News Data -->
+  <script src="news.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const newsContainer = document.getElementById('news-container');
+      
+      if (newsContainer && typeof newsData !== 'undefined') {
+        // Take only the first 4 items if there are more
+        const itemsToShow = newsData.slice(0, 4);
+        
+        itemsToShow.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'news-card';
+          card.innerHTML = `
+            <a href="${item.link}" target="_blank" class="news-image-container" style="display: block;">
+              <img src="${item.image}" alt="News Image" class="news-image">
+            </a>
+          `;
+          newsContainer.appendChild(card);
+        });
+      }
+
+      // Animation for News Section
+      const newsSection = document.querySelector('.news-section');
+      const newsTitle = document.querySelector('.news-section .section-title span');
+      
+      const newsObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            newsSection.style.opacity = '1';
+            if(newsTitle) newsTitle.classList.add('animate-title-in');
+          } else {
+            // Optional: Reset animation
+            // newsSection.style.opacity = '0';
+            // if(newsTitle) newsTitle.classList.remove('animate-title-in');
+          }
+        });
+      }, { threshold: 0.2 });
+
+      if (newsSection) newsObserver.observe(newsSection);
     });
   </script>
 
