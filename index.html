@@ -1243,25 +1243,29 @@
   </script>
 
   <!-- Load News Data -->
-  <script src="news.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const newsContainer = document.getElementById('news-container');
       
-      if (newsContainer && typeof newsData !== 'undefined') {
-        // Take only the first 4 items if there are more
-        const itemsToShow = newsData.slice(0, 4);
-        
-        itemsToShow.forEach(item => {
-          const card = document.createElement('div');
-          card.className = 'news-card';
-          card.innerHTML = `
-            <a href="${item.link}" target="_blank" class="news-image-container" style="display: block;">
-              <img src="${item.image}" alt="News Image" class="news-image">
-            </a>
-          `;
-          newsContainer.appendChild(card);
-        });
+      if (newsContainer) {
+        fetch('news.json')
+          .then(response => response.json())
+          .then(newsData => {
+            // Take only the first 4 items if there are more
+            const itemsToShow = newsData.slice(0, 4);
+            
+            itemsToShow.forEach(item => {
+              const card = document.createElement('div');
+              card.className = 'news-card';
+              card.innerHTML = `
+                <a href="${item.link}" target="_blank" class="news-image-container" style="display: block;">
+                  <img src="${item.image}" alt="News Image" class="news-image">
+                </a>
+              `;
+              newsContainer.appendChild(card);
+            });
+          })
+          .catch(error => console.error('Error loading news:', error));
       }
 
       // Animation for News Section
