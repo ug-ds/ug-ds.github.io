@@ -133,6 +133,7 @@
     html{
     -webkit-text-size-adjust: 100%;
     -webkit-font-smoothing: antialiased;
+    
     } 
 
       ::-webkit-scrollbar {
@@ -353,10 +354,11 @@
 
     .about-title.animate-title-in {
       transform: translateY(0);
+      font-family: "TBCContractica", sans-serif;
     }
 
     .section-title {
-      font-family: "Saira", sans-serif;
+      font-family: "TBCContractica", sans-serif;
       font-size: clamp(2rem, 5vw, 3.5rem);
       font-weight: 700;
       text-align: center;
@@ -872,7 +874,7 @@
 
   <nav class="navbar">
     <div class="nav-reveal-container">
-      <a href="index.html" class="logo-link">
+      <a href="/" class="logo-link">
         <img src="assets/ug ds logo svg.svg" alt="UGDS Logo" class="logo-img">
       </a>
     </div>
@@ -1035,52 +1037,61 @@
           const span = line.querySelector('span');
           if (!span || span.dataset.switched === "true") return;
 
-          const originalText = span.innerText;
-          const targetText = t.text;
-          
-          // Create strip container
-          const strip = document.createElement('div');
-          strip.style.display = 'flex';
-          strip.style.flexDirection = 'column';
-          strip.style.transition = 'transform 1.8s cubic-bezier(.5,0,.2,1)';
-          strip.style.transform = 'translateY(0)';
-
-          // Generate items: Original -> Randoms -> Target
-          const items = [originalText];
-          for (let k = 0; k < 6; k++) items.push(generateRandomString(Math.max(originalText.length, targetText.length)));
-          items.push(targetText);
-
-          items.forEach((txt, idx) => {
-            const div = document.createElement('div');
-            div.textContent = txt;
-            div.className = 'anim-strip-item';
-            if (idx === items.length - 1) {
-              div.classList.add('geo-text');
-            }
-            strip.appendChild(div);
-          });
-
-          // Update span
-          span.innerHTML = '';
-          span.style.display = 'block';
-          span.style.height = '1.1em';
-          span.style.overflow = 'hidden';
-          span.appendChild(strip);
           span.dataset.switched = "true";
 
-          // Animate
+          // Start animation with a slight stagger
           setTimeout(() => {
-            const percentage = ((items.length - 1) / items.length) * 100;
-            strip.style.transform = `translateY(-${percentage}%)`;
-          }, 100 + (i * 150));
+            // Switch font to support Georgian
+            span.style.fontFamily = '"Saira", "TBCContractica", "Noto Sans Georgian", sans-serif';
+            animateTextChange(span, span.innerText, t.text);
+          }, i * 400);
         });
       }
 
-      function generateRandomString(len) {
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&∑∏∆◊";
-        let res = "";
-        for (let i = 0; i < len; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
-        return res;
+      function animateTextChange(element, startText, endText) {
+        const randomChars = "0123456789";
+        const duration = 2000; // 2 seconds for slow transition
+        const frameRate = 60;
+        const totalFrames = (duration / 1000) * frameRate;
+        let frame = 0;
+
+        const interval = setInterval(() => {
+          frame++;
+          const progress = frame / totalFrames;
+          
+          // Calculate current length interpolation
+          const currentLength = Math.round(startText.length + (endText.length - startText.length) * progress);
+          
+          // Scramble phase: 0.0 to 0.6
+          let scrambleProgress = progress / 0.6;
+          if (scrambleProgress > 1) scrambleProgress = 1;
+          
+          // Resolve phase: 0.4 to 1.0
+          let resolveProgress = (progress - 0.4) / 0.6;
+          if (resolveProgress < 0) resolveProgress = 0;
+          if (resolveProgress > 1) resolveProgress = 1;
+
+          const scrambleCount = Math.floor(currentLength * scrambleProgress);
+          const resolveCount = Math.floor(endText.length * resolveProgress);
+          
+          let output = "";
+          for (let i = 0; i < currentLength; i++) {
+            if (i < resolveCount) {
+              output += endText[i];
+            } else if (i < scrambleCount || i >= startText.length) {
+              output += randomChars[Math.floor(Math.random() * randomChars.length)];
+            } else {
+              output += startText[i];
+            }
+          }
+          
+          element.innerText = output;
+
+          if (frame >= totalFrames) {
+            clearInterval(interval);
+            element.innerText = endText;
+          }
+        }, 1000 / frameRate);
       }
 
       function resetHeroAnimations() {
